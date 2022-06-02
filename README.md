@@ -1,0 +1,2 @@
+# Climacoin
+Climacoin
