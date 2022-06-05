@@ -1,3 +1,4 @@
+use sc_service::{Properties};
 use node_template_runtime::{
 	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
 	SystemConfig, WASM_BINARY,
@@ -38,6 +39,12 @@ pub fn authority_keys_from_seed(s: &str) -> (AuraId, GrandpaId) {
 
 pub fn development_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
+
+	// Give your base currency a unit name and decimal places
+	let mut properties = Properties::new();
+	properties.insert("tokenSymbol".into(), "CLC".into());
+	properties.insert("tokenDecimals".into(), 12.into());
+	properties.insert("ss58Format".into(), 42.into());
 
 	Ok(ChainSpec::from_genesis(
 		// Name
@@ -139,7 +146,8 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
+			// balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
+			balances: endowed_accounts.iter().cloned().map(|k| (k, 35960000000)).collect(),
 		},
 		aura: AuraConfig {
 			authorities: initial_authorities.iter().map(|x| (x.0.clone())).collect(),
