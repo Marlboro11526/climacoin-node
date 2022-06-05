@@ -147,7 +147,7 @@ fn testnet_genesis(
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
 			// balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
-			balances: endowed_accounts.iter().cloned().map(|k| (k, 35960000000)).collect(),
+			balances: endowed_accounts.iter().cloned().map(|k| (k, 29000000000)).collect(),
 		},
 		aura: AuraConfig {
 			authorities: initial_authorities.iter().map(|x| (x.0.clone())).collect(),
