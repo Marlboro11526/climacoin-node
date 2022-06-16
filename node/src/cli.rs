@@ -1,5 +1,7 @@
 use sc_cli::RunCmd;
 
+use structopt::StructOpt;
+
 #[derive(Debug, clap::Parser)]
 pub struct Cli {
 	#[clap(subcommand)]
@@ -36,10 +38,14 @@ pub enum Subcommand {
 	/// Revert the chain to a previous state.
 	Revert(sc_cli::RevertCmd),
 
-	/// Sub-commands concerned with benchmarking.
-	#[clap(subcommand)]
-	Benchmark(frame_benchmarking_cli::BenchmarkCmd),
+	// /// Sub-commands concerned with benchmarking.
+	// #[clap(subcommand)]
+	// Benchmark(frame_benchmarking_cli::BenchmarkCmd),
 
+	/// The custom benchmark subcommmand benchmarking runtime pallets.
+	#[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
+	Benchmark(frame_benchmarking_cli::BenchmarkCmd),
+	
 	/// Try some command against runtime state.
 	#[cfg(feature = "try-runtime")]
 	TryRuntime(try_runtime_cli::TryRuntimeCmd),
