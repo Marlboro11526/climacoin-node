@@ -30,7 +30,6 @@ sc-consensus-babe-rpc = { version = '0.9.0' }
 sc-finality-grandpa-rpc = '0.9.0'
 sc-network = '0.9.0'
 sc-sync-state-rpc = '0.9.0'
-sc-telemetry = { version = '3.0.0' }
 sp-authority-discovery = '3.0.0'
 sp-consensus-babe = { version = '0.9.0' }
 sp-keystore = '0.9.0'
