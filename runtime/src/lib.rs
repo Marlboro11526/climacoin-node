@@ -87,18 +87,6 @@ pub mod opaque {
 	}
 }
 
-/// Constant values used within the runtime.
-pub mod constants;
-pub use constants::{
-    currency::*,
-	time::*,
-	time::EPOCH_DURATION_IN_BLOCKS,
-};
-use sp_runtime::generic::Era;
-pub mod types;
-pub use types::*;
-
-
 // To learn more about runtime versioning and what each of the following value means:
 //   https://docs.substrate.io/v3/runtime/upgrades#runtime-versioning
 #[sp_version::runtime_version]
