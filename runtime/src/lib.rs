@@ -33,7 +33,7 @@ pub use frame_support::{
 	StorageValue,
 };
 
-// use pallet_session::historical as pallet_session_historical;
+// use pallet_session::{historical as pallet_session_historical};
 
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
@@ -305,6 +305,39 @@ impl pallet_sudo::Config for Runtime {
 	type Call = Call;
 }
 
+// parameter_types! {
+// 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
+// }
+
+// impl pallet_session::Config for Runtime {
+// 	type Event = Event;
+// 	type ValidatorId = <Self as frame_system::Config>::AccountId;
+// 	type ValidatorIdOf = pallet_staking::StashOf<Self>;
+// 	type ShouldEndSession = Babe;
+// 	type NextSessionRotation = Babe;
+// 	type SessionManager = pallet_session::historical::NoteHistoricalRoot<Self, Staking>;
+// 	type SessionHandler = <opaque::SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+// 	type Keys = opaque::SessionKeys;
+// 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+// 	type WeightInfo = weights::pallet_session::WeightInfo;
+// }
+
+// impl pallet_session::historical::Trait for Runtime {
+// 	type FullIdentification = pallet_staking::Exposure<AccountId, Balance>;
+// 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
+// }
+
+// pallet_staking_reward_curve::build! {
+// 	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
+// 		min_inflation: 0_025_000,
+// 		max_inflation: 0_100_000,
+// 		ideal_stake: 0_500_000,
+// 		falloff: 0_050_000,
+// 		max_piece_count: 40,
+// 		test_precision: 0_005_000,
+// 	);
+// }
+
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
 	type Event = Event;
@@ -325,6 +358,8 @@ construct_runtime!(
 		Grandpa: pallet_grandpa,
 		Balances: pallet_balances,
 		
+		// Historical: pallet_session_historical,
+
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
@@ -478,7 +513,8 @@ impl_runtime_apis! {
 			_slot: sp_consensus_babe::Slot,
 			authority_id: sp_consensus_babe::AuthorityId,
 		) -> Option<sp_consensus_babe::OpaqueKeyOwnershipProof> {
-			use codec::Encode;
+			None
+			// use codec::Encode;
 
 			// Historical::prove((sp_consensus_babe::KEY_TYPE, authority_id))
 			// 	.map(|p| p.encode())
