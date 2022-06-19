@@ -3935,7 +3935,9 @@ dependencies = [
  "node-rpc",
  "node-template-runtime",
  "pallet-authority-discovery",
+ "pallet-contracts-rpc",
  "pallet-im-online",
+ "pallet-mmr-rpc",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
  "sc-authority-discovery",
@@ -3980,6 +3982,7 @@ dependencies = [
  "structopt",
  "substrate-build-script-utils",
  "substrate-frame-rpc-system",
+ "substrate-state-trie-migration-rpc",
  "try-runtime-cli",
  "vergen",
 ]
