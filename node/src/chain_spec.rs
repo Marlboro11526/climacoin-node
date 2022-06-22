@@ -50,7 +50,8 @@ where
 /// Helper function to generate stash, controller and session key from seed
 pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
 	(
-		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", s)),
+		// get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", s)),
+		get_account_id_from_seed::<sr25519::Public>(s),
 		get_account_id_from_seed::<sr25519::Public>(s),
 		get_from_seed::<BabeId>(s),
 		get_from_seed::<GrandpaId>(s),
@@ -269,7 +270,8 @@ fn testnet_genesis(
 
 	// stakers: all validators and nominators.
 	const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
-	const STASH: Balance = ENDOWMENT / 1000;
+	// const STASH: Balance = ENDOWMENT / 1000;
+	const STASH: Balance = 29000000000 / 1000;
 	let mut rng = rand::thread_rng();
 	let stakers = initial_authorities
 		.iter()
@@ -297,7 +299,7 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k, ENDOWMENT)).collect(),
+			balances: endowed_accounts.iter().cloned().map(|k| (k, 29000000000)).collect(),
 		},
 		session: SessionConfig {
 			keys: initial_authorities
