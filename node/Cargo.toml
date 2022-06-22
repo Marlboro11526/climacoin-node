@@ -1,20 +1,20 @@
 [package]
-name = "substrate-stencil"
+name = "substrate-climacoin"
 version = "4.0.0-dev"
 description = "A fresh FRAME-based Substrate node, ready for hacking."
-authors = ["Kaichao Sun"]
+authors = ["Ciprian"]
 homepage = "https://substrate.io/"
 edition = "2021"
 license = "Unlicense"
 publish = false
-repository = "https://github.com/kaichaosun/substrate-stencil"
+repository = "https://github.com/WB-Expert5007/Climacoin"
 build = "build.rs"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [[bin]]
-name = "substrate-stencil"
+name = "substrate-climacoin"
 
 [dependencies]
 clap = { version = "3.0", features = ["derive"] }
