@@ -110,7 +110,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		move || {
 			testnet_genesis(
 				// Initial PoA authorities
-				vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
+				vec![authority_keys_from_seed("Alice")],
 				vec![],
 				// Sudo account
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
