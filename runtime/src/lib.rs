@@ -73,6 +73,9 @@ pub use sp_runtime::BuildStorage;
 pub mod constants;
 use constants::currency::*;
 
+pub mod configs;
+use configs::*;
+
 mod voter_bags;
 
 /// Import the template pallet.
@@ -323,18 +326,6 @@ impl pallet_grandpa::Config for Runtime {
 
 	type WeightInfo = ();
 	type MaxAuthorities = ConstU32<32>;
-}
-
-parameter_types! {
-	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
-}
-
-impl pallet_timestamp::Config for Runtime {
-	/// A timestamp: milliseconds since the unix epoch.
-	type Moment = u64;
-	type OnTimestampSet = Babe;
-	type MinimumPeriod = MinimumPeriod;
-	type WeightInfo = ();
 }
 
 impl pallet_balances::Config for Runtime {
