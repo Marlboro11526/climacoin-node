@@ -272,7 +272,7 @@ fn testnet_genesis(
 	// stakers: all validators and nominators.
 	const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
 	// const STASH: Balance = ENDOWMENT / 1000;
-	const STASH: Balance = 29000000000 / 1000;
+	const STASH: Balance = 1_000_000_000_000_000_000_000;
 	let mut rng = rand::thread_rng();
 	let stakers = initial_authorities
 		.iter()
