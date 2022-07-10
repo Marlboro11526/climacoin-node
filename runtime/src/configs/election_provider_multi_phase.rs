@@ -31,6 +31,7 @@ parameter_types! {
 }
 
 
+
 impl onchain::Config for Runtime {
 	type Accuracy = Perbill;
 	type DataProvider = <Self as pallet_election_provider_multi_phase::Config>::DataProvider;
