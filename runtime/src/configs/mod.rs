@@ -5,3 +5,4 @@ pub mod balances;
 pub mod timestamp;
 pub mod transaction_payment;
 pub mod election_provider_multi_phase;
+pub mod membership;
