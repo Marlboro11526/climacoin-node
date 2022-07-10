@@ -2,7 +2,7 @@ use hex_literal::hex;
 use node_primitives::*;
 use node_template_runtime::{
 	constants::currency::*, opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig,
-	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations,
+	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations, SudoConfig,
 	SessionConfig, StakerStatus, StakingConfig, SystemConfig, TechnicalCommitteeConfig,
 	BABE_GENESIS_EPOCH_CONFIG, wasm_binary_unwrap,
 };
@@ -333,6 +333,10 @@ fn testnet_genesis(
 		},
 		technical_membership: Default::default(),
 		treasury: Default::default(),
+		sudo: SudoConfig {
+			// Assign network admin rights.
+			key: Some(root_key),
+		},
 		transaction_payment: Default::default(),
 	}
 }
