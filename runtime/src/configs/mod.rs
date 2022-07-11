@@ -28,3 +28,6 @@ pub use grandpa::*;
 
 pub mod system;
 pub use system::*;
+
+pub mod treasury;
+pub use treasury::*;
