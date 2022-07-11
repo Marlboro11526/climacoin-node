@@ -5,7 +5,10 @@ pub use babe::*;
 
 pub mod bags_list;
 pub mod balances;
-// pub mod collective;
+
+pub mod collective;
+pub use collective::*;
+
 pub mod timestamp;
 pub mod transaction_payment;
 
@@ -16,6 +19,7 @@ pub mod membership;
 pub mod im_online;
 pub mod offences;
 pub mod session;
+pub mod utility;
 
 pub mod staking;
 pub use staking::*;
