@@ -19,7 +19,7 @@
       "balances": {
         "balances": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8",
             29000000000000000000000
           ]
         ]
@@ -42,15 +42,15 @@
         "validatorCount": 1,
         "minimumValidatorCount": 1,
         "invulnerables": [
-          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+          "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8"
         ],
         "forceEra": "NotForcing",
         "slashRewardFraction": 100000000,
         "canceledPayout": 0,
         "stakers": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8",
+            "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8",
             1000000000000000000000,
             "Validator"
           ]
@@ -63,12 +63,12 @@
       "session": {
         "keys": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8",
+            "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8",
             {
-              "babe": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-              "grandpa": "5FA9nQDVg267DEd8m1ZypXLBnvN7SFxYwV7ndqSYGiN9TTpu",
-              "im_online": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+              "babe": "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8",
+              "grandpa": "5GY7DpeiizM63UjnezmZu1eXLwh3Xo3k7uLPZtFUyXhyWfTY",
+              "im_online": "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8"
             }
           ]
         ]
@@ -85,7 +85,7 @@
       "technicalCommittee": {
         "phantom": null,
         "members": [
-          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+          "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8"
         ]
       },
       "technicalMembership": {
@@ -93,7 +93,7 @@
         "phantom": null
       },
       "sudo": {
-        "key": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+        "key": "5CoYESQDEhQ1142KpwXQ23T473TwGsLFCQvvZBYazwgTeRC8"
       }
     }
   }
