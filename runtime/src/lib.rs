@@ -256,6 +256,7 @@ construct_runtime!(
 		TechnicalCommittee: pallet_collective::<Instance2>,
 		TechnicalMembership: pallet_membership::<Instance1>,
 		Sudo: pallet_sudo,
+		Elections: pallet_elections_phragmen,
 
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
@@ -310,6 +311,7 @@ mod benches {
 		[pallet_collective, Council]
 		[pallet_membership, TechnicalMembership]
 		[pallet_template, TemplateModule]
+		[pallet_elections_phragmen, Elections]
 	);
 }
 
