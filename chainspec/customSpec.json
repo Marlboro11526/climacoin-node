@@ -19,7 +19,7 @@
       "balances": {
         "balances": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg",
             29000000000000000000000
           ]
         ]
@@ -42,15 +42,15 @@
         "validatorCount": 1,
         "minimumValidatorCount": 1,
         "invulnerables": [
-          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+          "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg"
         ],
         "forceEra": "NotForcing",
         "slashRewardFraction": 100000000,
         "canceledPayout": 0,
         "stakers": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg",
+            "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg",
             1000000000000000000000,
             "Validator"
           ]
@@ -63,12 +63,30 @@
       "session": {
         "keys": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg",
+            "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg",
             {
-              "babe": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-              "grandpa": "5FA9nQDVg267DEd8m1ZypXLBnvN7SFxYwV7ndqSYGiN9TTpu",
-              "im_online": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+              "babe": "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg",
+              "grandpa": "5FoRGeFJkFKdN175FuUCPDpoeMWh9uDXhVccuzWsgdHAYuHj",
+              "im_online": "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg"
+            }
+          ],
+          [
+            "5Fuius4PjLSeB5wsTeeGehN2eYkPXhJLpVyi5etTXWAgtKDq",
+            "5Fuius4PjLSeB5wsTeeGehN2eYkPXhJLpVyi5etTXWAgtKDq",
+            {
+              "babe": "5Fuius4PjLSeB5wsTeeGehN2eYkPXhJLpVyi5etTXWAgtKDq",
+              "grandpa": "5E8cL49sbgZj7uJNjdmCmwDvQJwpdoQmYbvZZiE3j91q1f4j",
+              "im_online": "5Fuius4PjLSeB5wsTeeGehN2eYkPXhJLpVyi5etTXWAgtKDq"
+            }
+          ],
+          [ 
+            "5CLUJFkGvLTESysCriziSGZkLbgthxKwiPh1cnCnxYNsJVkb",
+            "5CLUJFkGvLTESysCriziSGZkLbgthxKwiPh1cnCnxYNsJVkb",
+            {
+              "babe": "5CLUJFkGvLTESysCriziSGZkLbgthxKwiPh1cnCnxYNsJVkb",
+              "grandpa": "5Db4jFXXYoZTe8RCXQwmzhT1sathfD7PmAFJJHxshmPkVd3q",
+              "im_online": "5CLUJFkGvLTESysCriziSGZkLbgthxKwiPh1cnCnxYNsJVkb"
             }
           ]
         ]
@@ -85,7 +103,7 @@
       "technicalCommittee": {
         "phantom": null,
         "members": [
-          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+          "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg"
         ]
       },
       "technicalMembership": {
@@ -93,7 +111,7 @@
         "phantom": null
       },
       "sudo": {
-        "key": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+        "key": "5CtkHa3ekT4ESNgR2WdBuu3PSx4P9Dw8TeKPR61pKj7M9Mgg"
       }
     }
   }
