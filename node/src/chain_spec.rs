@@ -1,8 +1,8 @@
 use hex_literal::hex;
 use node_primitives::*;
 use node_template_runtime::{
-	constants::currency::*, opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig,
-	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations, SudoConfig,
+	opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig,
+	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations, SudoConfig, TreasuryConfig,
 	SessionConfig, StakerStatus, StakingConfig, SystemConfig, TechnicalCommitteeConfig,
 	BABE_GENESIS_EPOCH_CONFIG, wasm_binary_unwrap,
 };
@@ -290,6 +290,9 @@ fn testnet_genesis(
 		.collect::<Vec<_>>();
 
 	let num_endowed_accounts = endowed_accounts.len();
+	let initial_supply = 29_000_000_000_000_000_000_000;
+	let treasury_balance = 4_000_000_000_000_000_000_000;
+	let user_balance = initial_supply - treasury_balance;
 
 	GenesisConfig {
 		system: SystemConfig {
@@ -298,7 +301,7 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k, 29000000000000000000000)).collect(),
+			balances: endowed_accounts.iter().cloned().map(|k| (k, user_balance)).collect(),
 		},
 		session: SessionConfig {
 			keys: initial_authorities
@@ -330,7 +333,9 @@ fn testnet_genesis(
 			phantom: Default::default(),
 		},
 		technical_membership: Default::default(),
-		treasury: Default::default(),
+		treasury: TreasuryConfig {
+			treasury_balance,
+		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
 			key: Some(root_key),
