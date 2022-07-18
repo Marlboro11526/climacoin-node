@@ -294,6 +294,9 @@ fn testnet_genesis(
 	let treasury_balance = 4_000_000_000_000_000_000_000;
 	let user_balance = initial_supply - treasury_balance;
 
+	let min_nominator_bond = 1_000_000_000_000_000;
+	let min_validator_bond = 1_000_000_000_000_000_000;
+
 	GenesisConfig {
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
@@ -317,6 +320,8 @@ fn testnet_genesis(
 			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
 			slash_reward_fraction: Perbill::from_percent(10),
 			stakers,
+			min_nominator_bond,
+			min_validator_bond,
 			// TODO: ForceEra::ForceNone
 			..Default::default()
 		},
