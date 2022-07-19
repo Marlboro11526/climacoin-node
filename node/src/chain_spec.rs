@@ -1,6 +1,6 @@
 use hex_literal::hex;
 use node_primitives::*;
-use node_template_runtime::{
+use climacoin_runtime::{
 	constants::currency::*, opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig,
 	// ElectionsConfig, 
 	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations, SudoConfig,
