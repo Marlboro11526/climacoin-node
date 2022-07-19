@@ -140,10 +140,6 @@ pub fn native_version() -> NativeVersion {
 	NativeVersion { runtime_version: VERSION, can_author_with: Default::default() }
 }
 
-
-impl pallet_randomness_collective_flip::Config for Runtime {}
-
-
 parameter_types! {
 	pub MaxNominations: u32 = <NposSolution16 as sp_npos_elections::NposSolution>::LIMIT as u32;
 }
@@ -152,7 +148,6 @@ parameter_types! {
 impl pallet_template::Config for Runtime {
 	type Event = Event;
 }
-
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
