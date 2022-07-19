@@ -1,9 +1,8 @@
 use hex_literal::hex;
 use node_primitives::*;
 use climacoin_runtime::{
-	opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig,
-	// ElectionsConfig, 
-	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations, SudoConfig,
+	opaque::SessionKeys, BabeConfig, BalancesConfig, CouncilConfig, TreasuryConfig,
+	GenesisConfig, GrandpaConfig, ImOnlineConfig, MaxNominations, SudoConfig, // ElectionsConfig, 
 	SessionConfig, StakerStatus, StakingConfig, SystemConfig, TechnicalCommitteeConfig,
 	BABE_GENESIS_EPOCH_CONFIG, wasm_binary_unwrap,
 };
