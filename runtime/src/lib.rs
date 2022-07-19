@@ -38,7 +38,7 @@ use sp_runtime::{
 		SaturatedConversion, StaticLookup,
 	},
 	transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-	ApplyExtrinsicResult, Perbill, Percent, Permill,
+	ApplyExtrinsicResult, Perbill, Permill,
 };
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
