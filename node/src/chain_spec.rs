@@ -8,7 +8,6 @@ use climacoin_runtime::{
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_service::ChainType;
-use sc_telemetry::TelemetryEndpoints;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
@@ -17,9 +16,8 @@ use sp_runtime::{
 	Perbill,
 };
 use sc_service::{Properties}; //import Properties
-
-// The URL for the telemetry server.
-// const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+use sc_telemetry::serde_json::Map;
+use jsonrpc_core::Value;
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -33,7 +31,6 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 
 type AccountPublic = <Signature as Verify>::Signer;
 
-const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
 fn session_keys(babe: BabeId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys {
 	SessionKeys { babe, grandpa, im_online }
@@ -59,14 +56,17 @@ pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, Grand
 	)
 }
 
-pub fn development_config() -> Result<ChainSpec, String> {
-
-	// Give your base currency a unit name and decimal places
+/// Climacoin Native Token Properties
+pub fn climacoin_properties() -> Map<String, Value> {
 	let mut properties = Properties::new();
 	properties.insert("tokenSymbol".into(), "CLC".into());
 	properties.insert("tokenDecimals".into(), 12.into());
 	properties.insert("ss58Format".into(), 42.into());
+	properties
+}
 
+
+pub fn development_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::from_genesis(
 		// Name
 		"Development",
@@ -94,11 +94,12 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		None,
 		None,
 		// Properties
-		Some(properties),
+		Some(climacoin_properties()),
 		// Extensions
 		None,
 	))
 }
+
 
 pub fn local_testnet_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::from_genesis(
@@ -137,9 +138,9 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		None,
 		// Protocol ID
 		None,
+		None,
 		// Properties
-		None,
-		None,
+		Some(climacoin_properties()),
 		// Extensions
 		None,
 	))
@@ -154,13 +155,11 @@ pub fn staging_network_config() -> ChainSpec {
 		ChainType::Live,
 		staging_network_config_genesis,
 		boot_nodes,
-		Some(
-			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-				.expect("Staging telemetry url is valid; qed"),
-		),
 		None,
 		None,
 		None,
+		// Properties
+		Some(climacoin_properties()),
 		Default::default(),
 	)
 }
@@ -269,8 +268,17 @@ fn testnet_genesis(
 			}
 		});
 
-	// const STASH: Balance = ENDOWMENT / 1000;
-	const STASH: Balance = 1_000_000_000_000_000_000;
+	const STASH: Balance = 1_000_000_000_000_000_000; // 1M
+
+	let num_endowed_accounts = endowed_accounts.len();
+	let initial_supply = 29_000_000_000_000_000_000_000; // 29B
+	let treasury_balance = 4_000_000_000_000_000_000_000; // 4B
+	let user_balance = initial_supply - treasury_balance; // 25B
+
+	let min_nominator_bond = 1_000_000_000_000_000; // 1K
+	let min_validator_bond = 1_000_000_000_000_000_000; // 1M
+
+
 	let mut rng = rand::thread_rng();
 	let stakers = initial_authorities
 		.iter()
@@ -288,14 +296,6 @@ fn testnet_genesis(
 			(x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
 		}))
 		.collect::<Vec<_>>();
-
-	let num_endowed_accounts = endowed_accounts.len();
-	let initial_supply = 29_000_000_000_000_000_000_000;
-	let treasury_balance = 4_000_000_000_000_000_000_000;
-	let user_balance = initial_supply - treasury_balance;
-
-	let min_nominator_bond = 1_000_000_000_000_000;
-	let min_validator_bond = 1_000_000_000_000_000_000;
 
 	GenesisConfig {
 		system: SystemConfig {
