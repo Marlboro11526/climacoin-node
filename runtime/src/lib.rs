@@ -6,17 +6,39 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+/// Wasm binary unwrapped. If built with `SKIP_WASM_BUILD`, the function panics.
+#[cfg(feature = "std")]
+pub fn wasm_binary_unwrap() -> &'static [u8] {
+	WASM_BINARY.expect(
+		"Development wasm binary is not available. This means the client is built with \
+		 `SKIP_WASM_BUILD` flag and it is only usable for production chains. Please rebuild with \
+		 the flag disabled.",
+	)
+}
+
+use codec::{Decode, Encode};
+use frame_election_provider_support::{onchain, ExtendedBalance};
+use frame_system::EnsureRoot;
+use node_primitives::*;
+use pallet_election_provider_multi_phase::SolutionAccuracyOf;
 use pallet_grandpa::{
 	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
+use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_api::impl_runtime_apis;
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
-	create_runtime_str, generic, impl_opaque_keys,
-	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, NumberFor, Verify},
-	transaction_validity::{TransactionSource, TransactionValidity},
-	ApplyExtrinsicResult, MultiSignature,
+	create_runtime_str,
+	curve::PiecewiseLinear,
+	generic,
+	generic::Era,
+	impl_opaque_keys,
+	traits::{
+		self, AccountIdLookup, BlakeTwo256, Block as BlockT, NumberFor, OpaqueKeys,
+		SaturatedConversion, StaticLookup,
+	},
+	transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
+	ApplyExtrinsicResult, Perbill, Percent, Permill,
 };
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -25,43 +47,38 @@ use sp_version::RuntimeVersion;
 
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
-	construct_runtime, parameter_types,
-	traits::{ConstU128, ConstU32, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo},
+	construct_runtime,
+	pallet_prelude::Get,
+	parameter_types,
+	traits::{
+		ConstU128, ConstU32, ConstU8, Currency, EnsureOneOf, EqualPrivilegeOnly, Imbalance,
+		KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, Randomness, StorageInfo,
+		U128CurrencyToVote, Contains,
+	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
-		IdentityFee, Weight,
+		DispatchClass, IdentityFee, Weight,
 	},
-	StorageValue,
+	PalletId, StorageValue,
 };
-pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
+#[cfg(any(feature = "std", test))]
+pub use pallet_staking::StakerStatus;
 pub use pallet_timestamp::Call as TimestampCall;
 use pallet_transaction_payment::CurrencyAdapter;
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
-pub use sp_runtime::{Perbill, Permill};
+
+pub mod constants;
+use constants::{currency::*, time::*};
+
+pub mod configs;
+use configs::*;
+
+mod voter_bags;
 
 /// Import the template pallet.
 pub use pallet_template;
-
-/// An index to a block.
-pub type BlockNumber = u32;
-
-/// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = MultiSignature;
-
-/// Some way of identifying an account on the chain. We intentionally make it equivalent
-/// to the public key of our transaction signing scheme.
-pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
-
-/// Balance of an account.
-pub type Balance = u128;
-
-/// Index of a transaction in the chain.
-pub type Index = u32;
-
-/// A hash of some data used by the chain.
-pub type Hash = sp_core::H256;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -81,8 +98,9 @@ pub mod opaque {
 
 	impl_opaque_keys! {
 		pub struct SessionKeys {
-			pub aura: Aura,
+			pub babe: Babe,
 			pub grandpa: Grandpa,
+			pub im_online: ImOnline,
 		}
 	}
 }
@@ -91,37 +109,30 @@ pub mod opaque {
 //   https://docs.substrate.io/v3/runtime/upgrades#runtime-versioning
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("node-template"),
-	impl_name: create_runtime_str!("node-template"),
+	spec_name: create_runtime_str!("climacoin-node"),
+	impl_name: create_runtime_str!("climacoin-node"),
 	authoring_version: 1,
 	// The version of the runtime specification. A full node will not attempt to use its native
 	//   runtime in substitute for the on-chain Wasm runtime unless all of `spec_name`,
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 100,
+	spec_version: 1,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 	state_version: 1,
 };
 
-/// This determines the average expected block time that we are targeting.
-/// Blocks will be produced at a minimum duration defined by `SLOT_DURATION`.
-/// `SLOT_DURATION` is picked up by `pallet_timestamp` which is in turn picked
-/// up by `pallet_aura` to implement `fn slot_duration()`.
-///
-/// Change this to adjust the block time.
-pub const MILLISECS_PER_BLOCK: u64 = 6000;
+// 1 in 4 blocks (on average, not counting collisions) will be primary BABE blocks.
+pub const PRIMARY_PROBABILITY: (u64, u64) = (1, 4);
 
-// NOTE: Currently it is not possible to change the slot duration after the chain has started.
-//       Attempting to do so will brick block production.
-pub const SLOT_DURATION: u64 = MILLISECS_PER_BLOCK;
-
-// Time is measured by number of blocks.
-pub const MINUTES: BlockNumber = 60_000 / (MILLISECS_PER_BLOCK as BlockNumber);
-pub const HOURS: BlockNumber = MINUTES * 60;
-pub const DAYS: BlockNumber = HOURS * 24;
+/// The BABE epoch configuration at genesis.
+pub const BABE_GENESIS_EPOCH_CONFIG: sp_consensus_babe::BabeEpochConfiguration =
+	sp_consensus_babe::BabeEpochConfiguration {
+		c: PRIMARY_PROBABILITY,
+		allowed_slots: sp_consensus_babe::AllowedSlots::PrimaryAndSecondaryPlainSlots,
+	};
 
 /// The version information used to identify this runtime when compiled natively.
 #[cfg(feature = "std")]
@@ -129,138 +140,8 @@ pub fn native_version() -> NativeVersion {
 	NativeVersion { runtime_version: VERSION, can_author_with: Default::default() }
 }
 
-const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-
 parameter_types! {
-	pub const Version: RuntimeVersion = VERSION;
-	pub const BlockHashCount: BlockNumber = 2400;
-	/// We allow for 2 seconds of compute with a 6 second average block time.
-	pub BlockWeights: frame_system::limits::BlockWeights = frame_system::limits::BlockWeights
-		::with_sensible_defaults(2 * WEIGHT_PER_SECOND, NORMAL_DISPATCH_RATIO);
-	pub BlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
-		::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
-	pub const SS58Prefix: u8 = 42;
-}
-
-// Configure FRAME pallets to include in runtime.
-
-impl frame_system::Config for Runtime {
-	/// The basic call filter to use in dispatchable.
-	type BaseCallFilter = frame_support::traits::Everything;
-	/// Block & extrinsics weights: base values and limits.
-	type BlockWeights = BlockWeights;
-	/// The maximum length of a block (in bytes).
-	type BlockLength = BlockLength;
-	/// The identifier used to distinguish between accounts.
-	type AccountId = AccountId;
-	/// The aggregated dispatch type that is available for extrinsics.
-	type Call = Call;
-	/// The lookup mechanism to get account ID from whatever is passed in dispatchers.
-	type Lookup = AccountIdLookup<AccountId, ()>;
-	/// The index type for storing how many extrinsics an account has signed.
-	type Index = Index;
-	/// The index type for blocks.
-	type BlockNumber = BlockNumber;
-	/// The type for hashing blocks and tries.
-	type Hash = Hash;
-	/// The hashing algorithm used.
-	type Hashing = BlakeTwo256;
-	/// The header type.
-	type Header = generic::Header<BlockNumber, BlakeTwo256>;
-	/// The ubiquitous event type.
-	type Event = Event;
-	/// The ubiquitous origin type.
-	type Origin = Origin;
-	/// Maximum number of block number to block hash mappings to keep (oldest pruned first).
-	type BlockHashCount = BlockHashCount;
-	/// The weight of database operations that the runtime can invoke.
-	type DbWeight = RocksDbWeight;
-	/// Version of the runtime.
-	type Version = Version;
-	/// Converts a module to the index of the module in `construct_runtime!`.
-	///
-	/// This type is being generated by `construct_runtime!`.
-	type PalletInfo = PalletInfo;
-	/// What to do if a new account is created.
-	type OnNewAccount = ();
-	/// What to do if an account is fully reaped from the system.
-	type OnKilledAccount = ();
-	/// The data to be stored in an account.
-	type AccountData = pallet_balances::AccountData<Balance>;
-	/// Weight information for the extrinsics of this pallet.
-	type SystemWeightInfo = ();
-	/// This is used as an identifier of the chain. 42 is the generic substrate prefix.
-	type SS58Prefix = SS58Prefix;
-	/// The set code logic, just the default since we're not a parachain.
-	type OnSetCode = ();
-	type MaxConsumers = frame_support::traits::ConstU32<16>;
-}
-
-impl pallet_randomness_collective_flip::Config for Runtime {}
-
-impl pallet_aura::Config for Runtime {
-	type AuthorityId = AuraId;
-	type DisabledValidators = ();
-	type MaxAuthorities = ConstU32<32>;
-}
-
-impl pallet_grandpa::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
-
-	type KeyOwnerProofSystem = ();
-
-	type KeyOwnerProof =
-		<Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(KeyTypeId, GrandpaId)>>::Proof;
-
-	type KeyOwnerIdentification = <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(
-		KeyTypeId,
-		GrandpaId,
-	)>>::IdentificationTuple;
-
-	type HandleEquivocation = ();
-
-	type WeightInfo = ();
-	type MaxAuthorities = ConstU32<32>;
-}
-
-parameter_types! {
-	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
-}
-
-impl pallet_timestamp::Config for Runtime {
-	/// A timestamp: milliseconds since the unix epoch.
-	type Moment = u64;
-	type OnTimestampSet = Aura;
-	type MinimumPeriod = MinimumPeriod;
-	type WeightInfo = ();
-}
-
-impl pallet_balances::Config for Runtime {
-	type MaxLocks = ConstU32<50>;
-	type MaxReserves = ();
-	type ReserveIdentifier = [u8; 8];
-	/// The type for recording an account's balance.
-	type Balance = Balance;
-	/// The ubiquitous event type.
-	type Event = Event;
-	type DustRemoval = ();
-	type ExistentialDeposit = ConstU128<500>;
-	type AccountStore = System;
-	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
-}
-
-impl pallet_transaction_payment::Config for Runtime {
-	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
-	type OperationalFeeMultiplier = ConstU8<5>;
-	type WeightToFee = IdentityFee<Balance>;
-	type LengthToFee = IdentityFee<Balance>;
-	type FeeMultiplierUpdate = ();
-}
-
-impl pallet_sudo::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
+	pub MaxNominations: u32 = <NposSolution16 as sp_npos_elections::NposSolution>::LIMIT as u32;
 }
 
 /// Configure the pallet-template in pallets/template.
@@ -276,13 +157,32 @@ construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
 		System: frame_system,
+		Utility: pallet_utility,
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip,
 		Timestamp: pallet_timestamp,
-		Aura: pallet_aura,
-		Grandpa: pallet_grandpa,
+		// Authorship must be before session in order to note author in the correct session and era
+		// for im-online and staking.
+		Authorship: pallet_authorship,
 		Balances: pallet_balances,
+		Babe: pallet_babe,
+		Grandpa: pallet_grandpa,
+		ElectionProviderMultiPhase: pallet_election_provider_multi_phase,
+		Staking: pallet_staking,
+		Session: pallet_session,
+		BagsList: pallet_bags_list,
+		Historical: pallet_session::historical::{Pallet},
+		Offences: pallet_offences,
+		ImOnline: pallet_im_online,
 		TransactionPayment: pallet_transaction_payment,
+
+		// Governance
+		Treasury: pallet_treasury,
+		Council: pallet_collective::<Instance1>,
+		TechnicalCommittee: pallet_collective::<Instance2>,
+		TechnicalMembership: pallet_membership::<Instance1>,
 		Sudo: pallet_sudo,
+		// Elections: pallet_elections_phragmen,
+
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
 	}
@@ -307,8 +207,6 @@ pub type SignedExtra = (
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
-/// The payload being signed in transactions.
-pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -317,6 +215,8 @@ pub type Executive = frame_executive::Executive<
 	Runtime,
 	AllPalletsWithSystem,
 >;
+/// The payload being signed in transactions.
+pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 
 #[cfg(feature = "runtime-benchmarks")]
 #[macro_use]
@@ -329,7 +229,14 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
+		[pallet_utility, Utility]
+		[pallet_offences, OffencesBench::<Runtime>]
+		[pallet_im_online, ImOnline]
+		[pallet_treasury, Treasury]
+		[pallet_collective, Council]
+		[pallet_membership, TechnicalMembership]
 		[pallet_template, TemplateModule]
+		// [pallet_elections_phragmen, Elections]
 	);
 }
 
@@ -391,13 +298,56 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {
-		fn slot_duration() -> sp_consensus_aura::SlotDuration {
-			sp_consensus_aura::SlotDuration::from_millis(Aura::slot_duration())
+	impl sp_consensus_babe::BabeApi<Block> for Runtime {
+		fn configuration() -> sp_consensus_babe::BabeGenesisConfiguration {
+			// The choice of `c` parameter (where `1 - c` represents the
+			// probability of a slot being empty), is done in accordance to the
+			// slot duration and expected target block time, for safely
+			// resisting network delays of maximum two seconds.
+			// <https://research.web3.foundation/en/latest/polkadot/BABE/Babe/#6-practical-results>
+			sp_consensus_babe::BabeGenesisConfiguration {
+				slot_duration: Babe::slot_duration(),
+				epoch_length: EpochDuration::get(),
+				c: BABE_GENESIS_EPOCH_CONFIG.c,
+				genesis_authorities: Babe::authorities().to_vec(),
+				randomness: Babe::randomness(),
+				allowed_slots: BABE_GENESIS_EPOCH_CONFIG.allowed_slots,
+			}
 		}
 
-		fn authorities() -> Vec<AuraId> {
-			Aura::authorities().into_inner()
+		fn current_epoch_start() -> sp_consensus_babe::Slot {
+			Babe::current_epoch_start()
+		}
+
+		fn current_epoch() -> sp_consensus_babe::Epoch {
+			Babe::current_epoch()
+		}
+
+		fn next_epoch() -> sp_consensus_babe::Epoch {
+			Babe::next_epoch()
+		}
+
+		fn generate_key_ownership_proof(
+			_slot: sp_consensus_babe::Slot,
+			authority_id: sp_consensus_babe::AuthorityId,
+		) -> Option<sp_consensus_babe::OpaqueKeyOwnershipProof> {
+			use codec::Encode;
+
+			Historical::prove((sp_consensus_babe::KEY_TYPE, authority_id))
+				.map(|p| p.encode())
+				.map(sp_consensus_babe::OpaqueKeyOwnershipProof::new)
+		}
+
+		fn submit_report_equivocation_unsigned_extrinsic(
+			equivocation_proof: sp_consensus_babe::EquivocationProof<<Block as BlockT>::Header>,
+			key_owner_proof: sp_consensus_babe::OpaqueKeyOwnershipProof,
+		) -> Option<()> {
+			let key_owner_proof = key_owner_proof.decode()?;
+
+			Babe::submit_unsigned_equivocation_report(
+				equivocation_proof,
+				key_owner_proof,
+			)
 		}
 	}
 
@@ -423,23 +373,29 @@ impl_runtime_apis! {
 		}
 
 		fn submit_report_equivocation_unsigned_extrinsic(
-			_equivocation_proof: fg_primitives::EquivocationProof<
+			equivocation_proof: fg_primitives::EquivocationProof<
 				<Block as BlockT>::Hash,
 				NumberFor<Block>,
 			>,
-			_key_owner_proof: fg_primitives::OpaqueKeyOwnershipProof,
+			key_owner_proof: fg_primitives::OpaqueKeyOwnershipProof,
 		) -> Option<()> {
-			None
+			let key_owner_proof = key_owner_proof.decode()?;
+
+			Grandpa::submit_unsigned_equivocation_report(
+				equivocation_proof,
+				key_owner_proof,
+			)
 		}
 
 		fn generate_key_ownership_proof(
 			_set_id: fg_primitives::SetId,
-			_authority_id: GrandpaId,
+			authority_id: GrandpaId,
 		) -> Option<fg_primitives::OpaqueKeyOwnershipProof> {
-			// NOTE: this is the only implementation possible since we've
-			// defined our key owner proof type as a bottom type (i.e. a type
-			// with no values).
-			None
+			use codec::{Encode};
+
+			Historical::prove((fg_primitives::KEY_TYPE, authority_id))
+				.map(|p| p.encode())
+				.map(fg_primitives::OpaqueKeyOwnershipProof::new)
 		}
 	}
 
@@ -472,6 +428,12 @@ impl_runtime_apis! {
 		) {
 			use frame_benchmarking::{baseline, Benchmarking, BenchmarkList};
 			use frame_support::traits::StorageInfoTrait;
+
+			// Trying to add benchmarks directly to the offences Pallet caused cyclic dependency
+			// issues. To get around that, we separated the Session benchmarks into its own crate,
+			// which is why we need these two lines below.
+			use pallet_offences_benchmarking::Pallet as OffencesBench;
+
 			use frame_system_benchmarking::Pallet as SystemBench;
 			use baseline::Pallet as BaselineBench;
 
@@ -490,6 +452,13 @@ impl_runtime_apis! {
 
 			use frame_system_benchmarking::Pallet as SystemBench;
 			use baseline::Pallet as BaselineBench;
+
+			// Trying to add benchmarks directly to the offences Pallet caused cyclic dependency
+			// issues. To get around that, we separated the Session benchmarks into its own crate,
+			// which is why we need these two lines below.
+			use pallet_offences_benchmarking::Pallet as OffencesBench;
+
+			impl pallet_offences_benchmarking::Config for Runtime {}
 
 			impl frame_system_benchmarking::Config for Runtime {}
 			impl baseline::Config for Runtime {}
