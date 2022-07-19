@@ -1,5 +1,5 @@
 [package]
-name = "node-template-runtime"
+name = "climacoin-runtime"
 version = "4.0.0-dev"
 description = "A fresh FRAME-based Substrate runtime, ready for hacking."
 authors = ["Substrate DevHub <https://github.com/substrate-developer-hub>"]
