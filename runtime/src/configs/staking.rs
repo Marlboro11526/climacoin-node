@@ -25,7 +25,7 @@ parameter_types! {
 	pub const SlashDeferDuration: sp_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
-	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
+	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(0);
 	pub OffchainRepeat: BlockNumber = 5;
 }
 
