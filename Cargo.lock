@@ -866,7 +866,7 @@ dependencies = [
  "pallet-offences-benchmarking",
  "pallet-randomness-collective-flip",
  "pallet-session",
- "pallet-staking 4.0.0-dev",
+ "pallet-staking 4.0.0-dev (git+https://github.com/fennsaji/pallet-staking?branch=main)",
  "pallet-staking-reward-curve",
  "pallet-sudo",
  "pallet-template",
@@ -4176,6 +4176,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "4.0.0-dev"
+source = "git+https://github.com/fennsaji/pallet-staking?branch=main#ed6355e4702944fe9a52132fa6540fefee6eb946"
 dependencies = [
  "frame-election-provider-support",
  "frame-support",
@@ -4320,6 +4321,7 @@ dependencies = [
 [[package]]
 name = "pallet-treasury"
 version = "4.0.0-dev"
+source = "git+https://github.com/fennsaji/pallet-treasury?branch=main#614d201e8c199f2627c59b1d0fbf40f650510425"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
