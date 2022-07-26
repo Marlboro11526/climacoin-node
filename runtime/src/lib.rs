@@ -20,6 +20,7 @@ use codec::{Decode, Encode};
 use frame_election_provider_support::{onchain, ExtendedBalance};
 use frame_system::EnsureRoot;
 use node_primitives::*;
+use pallet_contracts::weights::WeightInfo;
 use pallet_election_provider_multi_phase::SolutionAccuracyOf;
 use pallet_grandpa::{
 	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
@@ -52,7 +53,7 @@ pub use frame_support::{
 	parameter_types,
 	traits::{
 		ConstU128, ConstU32, ConstU8, Currency, EnsureOneOf, EqualPrivilegeOnly, Imbalance,
-		KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, Randomness, StorageInfo,
+		KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, Randomness, StorageInfo, Nothing,
 		U128CurrencyToVote, Contains,
 	},
 	weights::{
@@ -124,6 +125,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	state_version: 1,
 };
 
+/// We assume that ~10% of the block weight is consumed by `on_initialize` handlers.
+/// This is used to limit the maximal weight of a single extrinsic.
+const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
+
 // 1 in 4 blocks (on average, not counting collisions) will be primary BABE blocks.
 pub const PRIMARY_PROBABILITY: (u64, u64) = (1, 4);
 
@@ -181,6 +186,7 @@ construct_runtime!(
 		TechnicalCommittee: pallet_collective::<Instance2>,
 		TechnicalMembership: pallet_membership::<Instance1>,
 		Sudo: pallet_sudo,
+		Contracts: pallet_contracts,
 		// Elections: pallet_elections_phragmen,
 
 		// Include the custom logic from the pallet-template in the runtime.
@@ -232,6 +238,7 @@ mod benches {
 		[pallet_utility, Utility]
 		[pallet_offences, OffencesBench::<Runtime>]
 		[pallet_im_online, ImOnline]
+		[pallet_contracts, Contracts]
 		[pallet_treasury, Treasury]
 		[pallet_collective, Council]
 		[pallet_membership, TechnicalMembership]
@@ -402,6 +409,52 @@ impl_runtime_apis! {
 	impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
 		fn account_nonce(account: AccountId) -> Index {
 			System::account_nonce(account)
+		}
+	}
+
+	impl pallet_contracts_rpc_runtime_api::ContractsApi<
+		Block, AccountId, Balance, BlockNumber, Hash,
+	>
+		for Runtime
+	{
+		fn call(
+			origin: AccountId,
+			dest: AccountId,
+			value: Balance,
+			gas_limit: u64,
+			storage_deposit_limit: Option<Balance>,
+			input_data: Vec<u8>,
+		) -> pallet_contracts_primitives::ContractExecResult<Balance> {
+			Contracts::bare_call(origin, dest, value, gas_limit, storage_deposit_limit, input_data, true)
+		}
+
+		fn instantiate(
+			origin: AccountId,
+			value: Balance,
+			gas_limit: u64,
+			storage_deposit_limit: Option<Balance>,
+			code: pallet_contracts_primitives::Code<Hash>,
+			data: Vec<u8>,
+			salt: Vec<u8>,
+		) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, Balance>
+		{
+			Contracts::bare_instantiate(origin, value, gas_limit, storage_deposit_limit, code, data, salt, true)
+		}
+
+		fn upload_code(
+			origin: AccountId,
+			code: Vec<u8>,
+			storage_deposit_limit: Option<Balance>,
+		) -> pallet_contracts_primitives::CodeUploadResult<Hash, Balance>
+		{
+			Contracts::bare_upload_code(origin, code, storage_deposit_limit)
+		}
+
+		fn get_storage(
+			address: AccountId,
+			key: [u8; 32],
+		) -> pallet_contracts_primitives::GetStorageResult {
+			Contracts::get_storage(address, key)
 		}
 	}
 

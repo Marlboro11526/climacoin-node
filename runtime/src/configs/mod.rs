@@ -40,3 +40,6 @@ pub use treasury::*;
 // pub use elections::*;
 
 pub mod randomness_collective_flip;
+
+pub mod contracts;
+pub use contracts::*;
