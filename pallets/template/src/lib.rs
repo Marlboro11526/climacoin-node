@@ -20,7 +20,9 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 
 	use sp_runtime::traits::AtLeast32BitUnsigned;
-	// use sp_runtime::traits::Saturating;
+	// use sp_runtime::traits::CheckedSub;
+	// use sp_runtime::traits::CheckedAdd;
+	use sp_runtime::traits::Saturating;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -33,6 +35,7 @@ pub mod pallet {
 	}
 
 	#[pallet::pallet]
+	#[pallet::without_storage_info]
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
@@ -150,14 +153,14 @@ pub mod pallet {
 			let receiver_balance = Self::get_balance(&to);
 
 			// Calculate new balances.
-			let updated_from_balance = sender_balance.checked_sub(amount).ok_or(<Error<T>>::InsufficientFunds)?;
-			let updated_to_balance = receiver_balance.checked_add(amount).expect("Entire supply fits in u64, qed");
+			let updated_from_balance = sender_balance.saturating_sub(amount);
+			let updated_to_balance = receiver_balance.saturating_add(amount);
 
 			<BalanceToAccount<T>>::insert(&sender, updated_from_balance);
 			<BalanceToAccount<T>>::insert(&to, updated_to_balance);
 		
-			Self::deposit_event(Event::Transfer(sender, to, amount));
-			Ok(())
+			Self::deposit_event(Event::Transferred(sender, to, amount));
+			Ok(().into())
 		}
 	}
 }
