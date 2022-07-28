@@ -19,23 +19,14 @@ pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
-	use sp_runtime::traits::AtLeast32BitUnsigned;
-	// use sp_runtime::traits::CheckedSub;
-	// use sp_runtime::traits::CheckedAdd;
-	use sp_runtime::traits::Saturating;
-
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
-
-		// The type used to store balances.
-		type Balance: Member + Parameter + AtLeast32BitUnsigned + Default + Copy;
 	}
 
 	#[pallet::pallet]
-	#[pallet::without_storage_info]
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
@@ -47,16 +38,6 @@ pub mod pallet {
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
 	pub type Something<T> = StorageValue<_, u32>;
 
-	#[pallet::storage]
-	#[pallet::getter(fn get_balance)]
-	pub(super) type BalanceToAccount<T: Config> = StorageMap<
-		_,
-		Blake2_128Concat,
-		T::AccountId,
-		T::Balance,
-		ValueQuery
-	>;
-
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events-and-errors
 	#[pallet::event]
@@ -65,9 +46,6 @@ pub mod pallet {
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
-
-		MintedNewSupply(T::AccountId),
-		Transferred(T::AccountId, T::AccountId, T::Balance),
 	}
 
 	// Errors inform users that something went wrong.
@@ -119,48 +97,6 @@ pub mod pallet {
 					Ok(())
 				},
 			}
-		}
-
-		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn mint(
-			origin: OriginFor<T>,
-			#[pallet::compact] amount: T::Balance
-			) -> DispatchResultWithPostInfo {
-	
-			let sender = ensure_signed(origin)?;
-	
-			// // Check if the kitty does not already exist in our storage map
-			//  ensure!(Self::kitties(&kitty_id) == None, <Error<T>>::KittyExists);
-	
-			// Update storage.
-			<BalanceToAccount<T>>::insert(&sender, amount);
-	
-			// Emit an event.
-			Self::deposit_event(Event::MintedNewSupply(sender));
-	
-			// Return a successful DispatchResultWithPostInfo.
-			Ok(().into())
-		}
-
-		#[pallet::weight(1_000)]
-		pub fn transfer(
-			origin: OriginFor<T>,
-			to: T::AccountId,
-			#[pallet::compact] amount: T::Balance,
-		) -> DispatchResultWithPostInfo {
-			let sender = ensure_signed(origin)?;
-			let sender_balance = Self::get_balance(&sender);
-			let receiver_balance = Self::get_balance(&to);
-
-			// Calculate new balances.
-			let updated_from_balance = sender_balance.saturating_sub(amount);
-			let updated_to_balance = receiver_balance.saturating_add(amount);
-
-			<BalanceToAccount<T>>::insert(&sender, updated_from_balance);
-			<BalanceToAccount<T>>::insert(&to, updated_to_balance);
-		
-			Self::deposit_event(Event::Transferred(sender, to, amount));
-			Ok(().into())
 		}
 	}
 }
