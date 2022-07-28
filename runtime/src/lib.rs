@@ -147,8 +147,6 @@ parameter_types! {
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
 	type Event = Event;
-	
-	type Balance = Balance;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
