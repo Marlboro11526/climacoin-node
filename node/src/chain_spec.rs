@@ -224,9 +224,9 @@ fn testnet_genesis(
 	const STASH: Balance = 1_000_000__000_000_000_000; // 1M
 
 	let num_endowed_accounts = endowed_accounts.len();
-	let initial_supply:Balance  = 29_000_000_000__000_000_000_000; // 29B
-	let treasury_balance:Balance = 4_000_000_000__000_000_000_000; // 4B
-	let user_balance:Balance = initial_supply - treasury_balance; // 25B
+	let initial_supply: Balance  = 29_000_000_000__000_000_000_000; // 29B
+	let treasury_balance: Balance = 4_000_000_000__000_000_000_000; // 4B
+	let user_balance: Balance = initial_supply - treasury_balance; // 25B
 	let each_user_balance: Balance = user_balance / num_endowed_accounts as Balance; // 25B
 
 	let min_nominator_bond = 1_000__000_000_000_000; // 1K
@@ -258,7 +258,7 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k, each_user_balance)).collect(),
+			balances: endowed_accounts.iter().cloned().map(|k| (k, user_balance)).collect(),
 		},
 		session: SessionConfig {
 			keys: initial_authorities
