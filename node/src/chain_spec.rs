@@ -111,24 +111,22 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		move || {
 			testnet_genesis(
 				// Initial PoA authorities
-				vec![authority_keys_from_seed("Alice")],
+				vec![authority_keys_from_seed("Climacoin")],
 				vec![],
 				// Sudo account
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				get_account_id_from_seed::<sr25519::Public>("Climacoin"),
 				// Pre-funded accounts
 				vec![
+					get_account_id_from_seed::<sr25519::Public>("Climacoin"),
+					get_account_id_from_seed::<sr25519::Public>("Ciprian"),
+					get_account_id_from_seed::<sr25519::Public>("Fenn"),
+					get_account_id_from_seed::<sr25519::Public>("Artim"),
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
 					get_account_id_from_seed::<sr25519::Public>("Bob"),
 					get_account_id_from_seed::<sr25519::Public>("Charlie"),
 					get_account_id_from_seed::<sr25519::Public>("Dave"),
 					get_account_id_from_seed::<sr25519::Public>("Eve"),
 					get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-					get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
 			)
 		},
@@ -226,9 +224,10 @@ fn testnet_genesis(
 	const STASH: Balance = 1_000_000__000_000_000_000; // 1M
 
 	let num_endowed_accounts = endowed_accounts.len();
-	let initial_supply = 29_000_000_000__000_000_000_000; // 29B
-	let treasury_balance = 4_000_000_000__000_000_000_000; // 4B
-	let user_balance = initial_supply - treasury_balance; // 25B
+	let initial_supply: Balance  = 29_000_000_000__000_000_000_000; // 29B
+	let treasury_balance: Balance = 4_000_000_000__000_000_000_000; // 4B
+	let user_balance: Balance = initial_supply - treasury_balance; // 25B
+	let each_user_balance: Balance = user_balance / num_endowed_accounts as Balance; // 25B
 
 	let min_nominator_bond = 1_000__000_000_000_000; // 1K
 	let min_validator_bond = 1_000_000__000_000_000_000; // 1M
