@@ -98,11 +98,11 @@ rustup target add wasm32-unknown-unknown --toolchain nightly
 Now the best way to ensure that you have successfully prepared a computer for Substrate
 development is to follow the steps in [our first tutorial](https://docs.substrate.io/tutorials/v3/create-your-first-substrate-chain/).
 
-> For more details on _why_ these dependencies are used, and for _troubleshooting_ errors building the template, read on.
+> For more details on _why_ these dependencies are used, and for _troubleshooting_ errors building the node, read on.
 
 ## Troubleshooting Substrate builds
 
-Sometimes you can't get the [Substrate node template](https://github.com/substrate-developer-hub/substrate-node-template)
+Sometimes you can't get the [node](https://github.com/climatechglobal/climacoin-node)
 to compile out of the box. Here are some tips to help you work through that.
 
 ### Rust configuration check
