@@ -2,7 +2,12 @@
 members = [
     "node",
     "pallets/template",
+    "pallets/offchain-fetch",
     "runtime",
 ]
 [profile.release]
 panic = "unwind"
+
+[patch.'https://github.com/paritytech/substrate']
+pallet-staking = { git = "https://github.com/climatechglobal/pallet-staking", branch = "main" }
+pallet-treasury = { git = "https://github.com/climatechglobal/pallet-treasury", branch = "main" }

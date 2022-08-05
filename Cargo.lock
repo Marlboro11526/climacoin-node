@@ -870,7 +870,7 @@ dependencies = [
  "pallet-offences-benchmarking",
  "pallet-randomness-collective-flip",
  "pallet-session",
- "pallet-staking 4.0.0-dev (git+https://github.com/climatechglobal/pallet-staking?branch=main)",
+ "pallet-staking",
  "pallet-staking-reward-curve",
  "pallet-sudo",
  "pallet-template",
@@ -3851,6 +3851,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "offchain-fetch"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4218,7 +4232,7 @@ dependencies = [
  "pallet-im-online",
  "pallet-offences",
  "pallet-session",
- "pallet-staking 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.18)",
+ "pallet-staking",
  "parity-scale-codec",
  "scale-info",
  "sp-runtime",
@@ -4266,27 +4280,6 @@ name = "pallet-staking"
 version = "4.0.0-dev"
 source = "git+https://github.com/climatechglobal/pallet-staking?branch=main#ed6355e4702944fe9a52132fa6540fefee6eb946"
 dependencies = [
- "frame-election-provider-support",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "pallet-session",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-application-crypto",
- "sp-io",
- "sp-runtime",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-staking"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.18#fc3fd073d3a0acf9933c3994b660ebd7b5833f65"
-dependencies = [
  "frame-benchmarking",
  "frame-election-provider-support",
  "frame-support",
@@ -4297,6 +4290,7 @@ dependencies = [
  "parity-scale-codec",
  "rand_chacha 0.2.2",
  "scale-info",
+ "serde",
  "sp-application-crypto",
  "sp-io",
  "sp-runtime",
