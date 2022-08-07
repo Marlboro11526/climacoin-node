@@ -24,11 +24,32 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
+		type Slash = Treasury;
 	}
 
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
+
+	#[pallet::hooks]
+	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+		fn on_initialize(_n: T::BlockNumber) -> frame_support::weights::Weight {
+			let initial_supply = 29000000000;
+
+			if _n < 6307200 {
+				let mintAmount = (initial_supply * 0.01) / 365;
+			} else if _n < 31536000 && _n > 6307200 {
+				let mintAmount = (initial_supply * 0.02) / 365;
+			} else if _n > 63072000 {
+				let mintAmount = (initial_supply * 0.03) / 365;
+			}
+			// mint token
+			if _n % 17280 == 0 {
+				Treasury::on_unbalanced(mintAmount);
+			}
+		}
+	}
 
 	// The pallet's runtime storage items.
 	// https://docs.substrate.io/v3/runtime/storage
