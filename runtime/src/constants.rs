@@ -4,7 +4,7 @@
 pub mod currency {
 	use node_primitives::Balance;
 
-	pub const MILLICENTS: Balance = 1_000_000_000;
+	pub const MILLICENTS: Balance = 10_000_000;
 	pub const CENTS: Balance = 1_000 * MILLICENTS; // assume this is worth about a cent.
 	pub const DOLLARS: Balance = 100 * CENTS;
 
@@ -34,7 +34,8 @@ pub mod time {
 
 	// NOTE: Currently it is not possible to change the epoch duration after the chain has started.
 	//       Attempting to do so will brick block production.
-	pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 4 * HOURS;
+	// TODO: Update this to 4 Hours for prod
+	pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 1 * HOURS;
 	pub const EPOCH_DURATION_IN_SLOTS: u64 = {
 		const SLOT_FILL_RATE: f64 = MILLISECS_PER_BLOCK as f64 / SLOT_DURATION as f64;
 
