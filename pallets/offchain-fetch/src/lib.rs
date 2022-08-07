@@ -50,8 +50,8 @@ use frame_support::traits::Get;
 use frame_system::{
 	self as system,
 	offchain::{
-		AppCrypto, CreateSignedTransaction, SendSignedTransaction, SendUnsignedTransaction,
-		SignedPayload, Signer, SigningTypes, SubmitTransaction,
+		AppCrypto, CreateSignedTransaction, SendSignedTransaction,
+		SignedPayload, Signer, SigningTypes,
 	},
 };
 use lite_json::json::JsonValue;
@@ -59,17 +59,17 @@ use sp_core::crypto::KeyTypeId;
 use sp_runtime::{
 	offchain::{
 		http,
-		storage::{MutateStorageError, StorageRetrievalError, StorageValueRef},
 		Duration,
 	},
-	traits::Zero,
-	transaction_validity::{InvalidTransaction, TransactionValidity, ValidTransaction},
 	RuntimeDebug,
 };
 use sp_std::vec::Vec;
-
+pub use pallet::*;
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod mock;
 
 /// Defines application identifier for crypto keys of this module.
 ///
@@ -111,7 +111,6 @@ pub mod crypto {
 	}
 }
 
-pub use pallet::*;
 
 #[frame_support::pallet]
 pub mod pallet {
