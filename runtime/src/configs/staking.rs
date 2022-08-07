@@ -1,16 +1,15 @@
 #![allow(unused_imports)]
 
-
 use crate::*;
 use pallet_treasury::BurnImbalanceAdapter;
 
 pallet_staking_reward_curve::build! {
 	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
-		min_inflation: 0_025_000,
-		max_inflation: 0_100_000,
+		min_inflation: 0_010_000,
+		max_inflation: 0_025_000,
 		ideal_stake: 0_100_000,
 		falloff: 0_050_000,
-		max_piece_count: 40,
+		max_piece_count: 80,
 		test_precision: 0_005_000,
 	);
 }
@@ -23,7 +22,7 @@ impl pallet_staking::BenchmarkingConfig for StakingBenchmarkingConfig {
 
 parameter_types! {
 	// TODO: Update SessionsPerEra BondingDuration SlashDeferDuration For PROD
-	pub const SessionsPerEra: sp_staking::SessionIndex = 2;
+	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
 	pub const BondingDuration: sp_staking::EraIndex = 1 * 28;
 	pub const SlashDeferDuration: sp_staking::EraIndex = 1 * 7; // 1/4 the bonding duration.
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
