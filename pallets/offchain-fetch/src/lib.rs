@@ -64,6 +64,8 @@ use sp_runtime::{
 	RuntimeDebug,
 };
 use sp_std::vec::Vec;
+use frame_support::pallet_prelude::*;
+
 pub use pallet::*;
 #[cfg(test)]
 mod tests;
@@ -383,4 +385,20 @@ impl<T: Config> Pallet<T> {
 		}
 	}
 
+}
+
+
+pub trait FetchPriceFor<T: Config> {
+	fn get_price_for() -> Option<BoundedVec<u32, T::MaxPrices>>;
+}
+
+impl<T: Config> FetchPriceFor<T> for Pallet<T> {
+	fn get_price_for() -> Option<BoundedVec<u32, T::MaxPrices>> {
+		let prices = <Prices<T>>::get();
+		if prices.is_empty() {
+			None
+		} else {
+			Some(prices)
+		}
+	}
 }
