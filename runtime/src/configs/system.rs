@@ -15,18 +15,18 @@ parameter_types! {
 	pub const SS58Prefix: u8 = 42;
 }
 
-pub struct BaseFilter;
-impl Contains<Call> for BaseFilter {
-	fn contains(call: &Call) -> bool {
-		!matches!(call, Call::TemplateModule(..))
-	}
-}
+// pub struct BaseFilter;
+// impl Contains<Call> for BaseFilter {
+// 	fn contains(call: &Call) -> bool {
+// 		!matches!(call, Call::TemplateModule(..))
+// 	}
+// }
 
 // Configure FRAME pallets to include in runtime.
 
 impl frame_system::Config for Runtime {
 	/// The basic call filter to use in dispatchable.
-	type BaseCallFilter = BaseFilter;
+	type BaseCallFilter = Everything;
 	/// Block & extrinsics weights: base values and limits.
 	type BlockWeights = BlockWeights;
 	/// The maximum length of a block (in bytes).
