@@ -4298,7 +4298,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "4.0.0-dev"
-source = "git+https://github.com/climatechglobal/pallet-staking?branch=main#ed6355e4702944fe9a52132fa6540fefee6eb946"
+source = "git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.18#fc3fd073d3a0acf9933c3994b660ebd7b5833f65"
 dependencies = [
  "frame-benchmarking",
  "frame-election-provider-support",
