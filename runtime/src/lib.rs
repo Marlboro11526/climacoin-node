@@ -54,7 +54,7 @@ pub use frame_support::{
 	traits::{
 		ConstU128, ConstU32, ConstU8, Currency, EnsureOneOf, EqualPrivilegeOnly, Imbalance,
 		KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, Randomness, StorageInfo, Nothing,
-		U128CurrencyToVote, Contains,
+		U128CurrencyToVote, Contains, Everything,
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -231,7 +231,6 @@ mod benches {
 		[pallet_treasury, Treasury]
 		[pallet_collective, Council]
 		[pallet_membership, TechnicalMembership]
-		[pallet_template, TemplateModule]
 		// [pallet_elections_phragmen, Elections]
 	);
 }
