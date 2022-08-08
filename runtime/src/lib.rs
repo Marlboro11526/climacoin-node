@@ -78,9 +78,6 @@ use configs::*;
 
 mod voter_bags;
 
-/// Import the template pallet.
-pub use pallet_template;
-
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -149,11 +146,6 @@ parameter_types! {
 	pub MaxNominations: u32 = <NposSolution16 as sp_npos_elections::NposSolution>::LIMIT as u32;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
-	type Event = Event;
-}
-
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -188,9 +180,6 @@ construct_runtime!(
 		Sudo: pallet_sudo,
 		Contracts: pallet_contracts,
 		// Elections: pallet_elections_phragmen,
-
-		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template,
 	}
 );
 
