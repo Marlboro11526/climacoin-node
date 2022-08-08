@@ -5,7 +5,7 @@ set -e
 
 seed=$1
 spec=${2:-chainspec/testnet/specRaw.json}
-path=${3:-/tmp/climacoin/node01}
+path=${3:-/tmp/climacoin/node}
 
 echo "*** Inserting keys ***"
 echo ""
