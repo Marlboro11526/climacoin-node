@@ -78,4 +78,3 @@ substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/pa
 [features]
 default = []
 runtime-benchmarks = ["climacoin-runtime/runtime-benchmarks"]
-ocw = []
