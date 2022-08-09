@@ -224,10 +224,10 @@ fn testnet_genesis(
 	const STASH: Balance = 1_000_000__000_000_000_000; // 1M
 
 	let num_endowed_accounts = endowed_accounts.len();
-	let initial_supply: Balance  = 29_000_000_000__000_000_000_000; // 29B
-	let treasury_balance: Balance = 4_000_000_000__000_000_000_000; // 4B
-	let user_balance: Balance = initial_supply - treasury_balance; // 25B
-	let each_user_balance: Balance = user_balance / num_endowed_accounts as Balance; // 25B
+	let initial_supply: Balance  = 1_000_000_000__000_000_000_000; // 1B
+	let treasury_balance: Balance = 100_000_000__000_000_000_000; // 100M
+	let user_balance: Balance = initial_supply - treasury_balance; // 900M
+	let each_user_balance: Balance = user_balance / num_endowed_accounts as Balance;
 
 	let min_nominator_bond = 1_000__000_000_000_000; // 1K
 	let min_validator_bond = 1_000_000__000_000_000_000; // 1M
